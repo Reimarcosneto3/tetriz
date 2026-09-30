@@ -1,0 +1,2360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#2b313d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tetrix 8-Bit" />
+  <meta name="description" content="Tetrix Retrô 8-Bit Mobile - Jogo clássico estilo Game Boy / NES portátil para celular." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <title>Tetrix Retrô 8-Bit</title>
+  <style>
+    /* ==========================================================================
+       RETRO GAME BOY (DMG-01) PALETTE & THEMES
+       ========================================================================== */
+    :root {
+      /* Casing / Shell (Classic DMG-01 Warm Game Boy Gray) */
+      --casing-bg: #c9ccd4;
+      --casing-border: #a2a7b3;
+      --casing-shadow: #7a808e;
+      --casing-highlight: #e4e7ed;
+
+      /* Screen Bezel */
+      --bezel-bg: #4f5765;
+      --bezel-border: #2e3440;
+      --bezel-stripe-blue: #2b4570;
+      --bezel-stripe-burgundy: #8c2443;
+      --battery-led: #ff2233;
+
+      /* LCD Screen (Authentic 4-shade Dot-Matrix Green) */
+      --lcd-bg: #9bbc0f;
+      --lcd-light: #8bac0f;
+      --lcd-dark: #306230;
+      --lcd-darkest: #0f380f;
+
+      /* UI Text & Borders inside LCD */
+      --text-main: #0f380f;
+      --text-muted: #306230;
+      --border-retro: 2px solid #0f380f;
+      --border-double: 3px double #0f380f;
+
+      /* D-Pad & Buttons */
+      --dpad-color: #282a30;
+      --dpad-active: #151619;
+      --btn-a-color: #8c2443;
+      --btn-b-color: #8c2443;
+      --btn-pill-color: #7b8394;
+      --btn-text-color: #ffffff;
+
+      /* Safe Areas */
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+    }
+
+    /* THEME: NES Arcade 8-Bit (Colorido Retrô 1989) */
+    body.theme-nes {
+      --casing-bg: #22242a;
+      --casing-border: #14151a;
+      --casing-shadow: #0a0b0e;
+      --casing-highlight: #3b3f49;
+      --bezel-bg: #111215;
+      --bezel-border: #000000;
+      --lcd-bg: #000000;
+      --lcd-light: #1c202a;
+      --lcd-dark: #3f475a;
+      --lcd-darkest: #f0f4ff;
+      --text-main: #f0f4fc;
+      --text-muted: #8ea1c0;
+      --border-retro: 2px solid #f0f4fc;
+      --border-double: 3px double #f0f4fc;
+      --dpad-color: #2c2f38;
+      --btn-a-color: #d82800;
+      --btn-b-color: #d82800;
+      --btn-pill-color: #4a4e5a;
+    }
+
+    /* THEME: Game Boy Pocket (Preto e Branco LCD) */
+    body.theme-pocket {
+      --casing-bg: #d8dade;
+      --casing-border: #b0b4bc;
+      --bezel-bg: #383a40;
+      --lcd-bg: #b4beab;
+      --lcd-light: #9ea895;
+      --lcd-dark: #586050;
+      --lcd-darkest: #1a1e16;
+      --text-main: #1a1e16;
+      --text-muted: #586050;
+      --border-retro: 2px solid #1a1e16;
+      --border-double: 3px double #1a1e16;
+      --dpad-color: #242528;
+      --btn-a-color: #242528;
+      --btn-b-color: #242528;
+    }
+
+    /* THEME: Cyberpunk 80s Synthwave */
+    body.theme-synth {
+      --casing-bg: #120e24;
+      --casing-border: #ff007f;
+      --casing-shadow: #05040a;
+      --casing-highlight: #2c1e55;
+      --bezel-bg: #0a0715;
+      --bezel-border: #00f0ff;
+      --lcd-bg: #050510;
+      --lcd-light: #191238;
+      --lcd-dark: #ff007f;
+      --lcd-darkest: #00f0ff;
+      --text-main: #00f0ff;
+      --text-muted: #ff007f;
+      --border-retro: 2px solid #00f0ff;
+      --border-double: 3px double #00f0ff;
+      --dpad-color: #1a1533;
+      --btn-a-color: #ff007f;
+      --btn-b-color: #00f0ff;
+      --btn-text-color: #050510;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #151821;
+      color: var(--text-main);
+      font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+      image-rendering: pixelated;
+    }
+
+    /* Console Handheld Shell */
+    #console-shell {
+      width: 100%;
+      height: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--casing-bg);
+      border-left: 2px solid var(--casing-highlight);
+      border-right: 2px solid var(--casing-shadow);
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.8), inset 0 2px 4px var(--casing-highlight);
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+      padding-left: var(--safe-left);
+      padding-right: var(--safe-right);
+    }
+
+    /* Top Console Ridges / Grooves */
+    .casing-grooves {
+      height: 10px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+    .groove {
+      width: 28%;
+      height: 2px;
+      background: var(--casing-shadow);
+      border-bottom: 1px solid var(--casing-highlight);
+    }
+
+    /* Screen Bezel (Frame around the LCD) */
+    #screen-bezel {
+      background: var(--bezel-bg);
+      border-radius: 12px 12px 28px 12px;
+      margin: 4px 10px 6px 10px;
+      padding: 8px 8px 10px 8px;
+      border: 3px solid var(--bezel-border);
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), 0 2px 0 var(--casing-highlight);
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      position: relative;
+    }
+
+    /* Bezel Top Decals: Stripes & Title */
+    .bezel-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 6px 4px;
+      font-size: 0.52rem;
+      letter-spacing: 0.5px;
+      color: #b0b8c8;
+      border-bottom: 2px solid #20242e;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .bezel-stripes {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      max-width: 50px;
+    }
+    .stripe-blue { height: 2px; background: var(--bezel-stripe-blue); }
+    .stripe-burgundy { height: 2px; background: var(--bezel-stripe-burgundy); }
+
+    .bezel-title {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: #dce2ee;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .battery-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.45rem;
+      color: #9aa2b4;
+    }
+    .battery-led {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--battery-led);
+      box-shadow: 0 0 6px var(--battery-led);
+      animation: pulse-led 2s infinite ease-in-out;
+    }
+    @keyframes pulse-led {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.5; }
+    }
+
+    /* LCD Screen Display */
+    #lcd-display {
+      background: var(--lcd-bg);
+      border: 3px solid #1a2212;
+      border-radius: 4px;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    /* Dot-Matrix Scanline Effect */
+    #lcd-display::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(15, 56, 15, 0.06),
+        rgba(15, 56, 15, 0.06) 1px,
+        transparent 1px,
+        transparent 2px
+      ), repeating-linear-gradient(
+        90deg,
+        rgba(15, 56, 15, 0.04),
+        rgba(15, 56, 15, 0.04) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Screen Top Bar */
+    .screen-header {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      border-bottom: var(--border-retro);
+      font-size: 0.55rem;
+      flex-shrink: 0;
+      background: rgba(0, 0, 0, 0.04);
+      z-index: 6;
+    }
+
+    .logo-badge {
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .screen-header-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .retro-icon-btn {
+      background: transparent;
+      border: 1px solid var(--text-main);
+      color: var(--text-main);
+      width: 22px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      cursor: pointer;
+      font-family: inherit;
+      border-radius: 2px;
+    }
+    .retro-icon-btn:active {
+      background: var(--text-main);
+      color: var(--lcd-bg);
+    }
+    .retro-icon-btn svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    /* Play Area Inside LCD */
+    #lcd-play-area {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 4px;
+      gap: 6px;
+      min-height: 0;
+      position: relative;
+      z-index: 6;
+    }
+
+    /* Retro Side Panels */
+    .retro-side-panel {
+      width: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .retro-box {
+      border: var(--border-retro);
+      background: rgba(0, 0, 0, 0.03);
+      padding: 3px 2px;
+      text-align: center;
+      box-shadow: 1px 1px 0 var(--text-main);
+    }
+
+    .retro-label {
+      font-size: 0.45rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+
+    .retro-val {
+      font-size: 0.65rem;
+      font-weight: 900;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+      word-break: break-all;
+    }
+
+    /* Mini Canvases for Hold and Next */
+    .retro-preview {
+      width: 60px;
+      height: 48px;
+      margin: 1px auto;
+      display: block;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px dashed var(--text-muted);
+    }
+
+    .retro-next-box {
+      width: 60px;
+      height: 38px;
+      margin: 1px auto;
+      display: block;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px dashed var(--text-muted);
+    }
+
+    /* Board Center */
+    #board-wrapper {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-width: 0;
+      height: 100%;
+    }
+
+    #board-frame {
+      border: var(--border-retro);
+      box-shadow: 2px 2px 0 var(--text-main);
+      position: relative;
+      overflow: hidden;
+      background: var(--lcd-bg);
+      touch-action: none;
+    }
+
+    #board-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Retro Banner / Float text */
+    #retro-banner {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      font-size: 0.75rem;
+      font-weight: 900;
+      background: var(--text-main);
+      color: var(--lcd-bg);
+      padding: 6px 10px;
+      border: 2px solid var(--lcd-bg);
+      box-shadow: 2px 2px 0 #000;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.15s ease;
+      z-index: 25;
+      white-space: nowrap;
+    }
+    #retro-banner.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    #countdown-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--text-main);
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    /* Danger Pulse Line */
+    #danger-indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--battery-led);
+      opacity: 0;
+      pointer-events: none;
+      animation: pulse-danger 0.5s infinite alternate;
+    }
+    @keyframes pulse-danger {
+      from { opacity: 0.2; }
+      to { opacity: 1; }
+    }
+
+    /* Brand Logo Under Screen */
+    .casing-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 18px 0 18px;
+      flex-shrink: 0;
+    }
+    .brand-nintendo-style {
+      font-size: 0.75rem;
+      font-weight: 900;
+      font-style: italic;
+      color: #3b4252;
+      letter-spacing: 1px;
+    }
+    .brand-model-style {
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: #616c82;
+      border: 1px solid #616c82;
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       RETRO GAMEPAD CONTROLS (D-Pad + A/B + Select/Start)
+       ========================================================================== */
+    #gamepad-area {
+      flex: 0 0 auto;
+      padding: 6px 12px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .gamepad-upper-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* Authentic D-PAD (Cross layout) */
+    .dpad-cross {
+      width: 130px;
+      height: 130px;
+      position: relative;
+      background: transparent;
+      flex-shrink: 0;
+    }
+
+    .dpad-center {
+      position: absolute;
+      top: 42px;
+      left: 42px;
+      width: 46px;
+      height: 46px;
+      background: var(--dpad-color);
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.5);
+    }
+    .dpad-center::after {
+      content: "";
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .dpad-btn {
+      position: absolute;
+      background: var(--dpad-color);
+      border: none;
+      color: #949aa6;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      font-size: 0.7rem;
+      box-shadow: 0 3px 0 #121316, inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+    .dpad-btn:active, .dpad-btn.pressed {
+      background: var(--dpad-active);
+      color: #fff;
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #121316;
+    }
+
+    .dpad-up {
+      top: 2px;
+      left: 42px;
+      width: 46px;
+      height: 42px;
+      border-radius: 5px 5px 0 0;
+    }
+    .dpad-down {
+      bottom: 2px;
+      left: 42px;
+      width: 46px;
+      height: 42px;
+      border-radius: 0 0 5px 5px;
+    }
+    .dpad-left {
+      top: 42px;
+      left: 2px;
+      width: 42px;
+      height: 46px;
+      border-radius: 5px 0 0 5px;
+    }
+    .dpad-right {
+      top: 42px;
+      right: 2px;
+      width: 42px;
+      height: 46px;
+      border-radius: 0 5px 5px 0;
+    }
+
+    /* Fast Drop Button on top of D-Pad */
+    .dpad-up .btn-sublabel {
+      font-size: 0.38rem;
+      position: absolute;
+      top: 4px;
+      font-weight: 700;
+      color: #e57373;
+    }
+
+    /* ACTION BUTTONS (A & B) */
+    .actions-cluster {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transform: rotate(-22deg); /* Iconic 25-degree Game Boy button tilt */
+      margin-top: 10px;
+      margin-right: 8px;
+    }
+
+    .round-btn-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .retro-round-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      color: var(--btn-text-color);
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      box-shadow: 0 4px 0 #3a0a18, 0 5px 8px rgba(0, 0, 0, 0.4), inset 0 2px 2px rgba(255, 255, 255, 0.3);
+      transition: transform 0.05s;
+    }
+    .retro-round-btn:active, .retro-round-btn.pressed {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #3a0a18, inset 0 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-b {
+      background: var(--btn-b-color);
+    }
+    .btn-a {
+      background: var(--btn-a-color);
+    }
+
+    .btn-label-retro {
+      font-size: 0.5rem;
+      font-weight: 900;
+      color: #2b313d;
+      letter-spacing: 1px;
+    }
+
+    /* LOWER ROW: SELECT & START PILL BUTTONS */
+    .gamepad-lower-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 36px;
+      padding-top: 2px;
+    }
+
+    .pill-btn-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transform: rotate(-22deg);
+    }
+
+    .retro-pill-btn {
+      width: 48px;
+      height: 14px;
+      background: var(--btn-pill-color);
+      border-radius: 8px;
+      border: 1px solid #4a505e;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #282b33;
+      touch-action: none;
+    }
+    .retro-pill-btn:active, .retro-pill-btn.pressed {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #282b33;
+      background: #505562;
+    }
+
+    .pill-label {
+      font-size: 0.45rem;
+      font-weight: 900;
+      color: #2b313d;
+      letter-spacing: 0.5px;
+    }
+
+    /* Speaker Grille in Bottom Right */
+    .speaker-grille {
+      position: absolute;
+      bottom: 8px;
+      right: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform: rotate(-25deg);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    .grille-line {
+      width: 42px;
+      height: 3px;
+      background: #2b313d;
+      border-radius: 2px;
+    }
+
+    /* Quick controls mode / toggle helper */
+    .casing-controls-helper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.42rem;
+      color: #555d70;
+      padding: 0 14px;
+      margin-top: -2px;
+    }
+    .helper-toggle {
+      border: 1px solid #6b7280;
+      background: rgba(0, 0, 0, 0.05);
+      color: inherit;
+      font-family: inherit;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.42rem;
+    }
+
+    /* RETRO MODALS OVERLAY */
+    .retro-modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 20, 28, 0.85);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .retro-modal-overlay.active {
+      display: flex;
+    }
+
+    .retro-modal-card {
+      width: 100%;
+      max-width: 320px;
+      background: var(--lcd-bg);
+      border: 4px solid var(--text-main);
+      box-shadow: 4px 4px 0 #000;
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--text-main);
+    }
+
+    .retro-modal-title {
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 2px dashed var(--text-main);
+      padding-bottom: 6px;
+    }
+
+    .retro-modal-subtitle {
+      font-size: 0.48rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .retro-menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .retro-menu-item {
+      border: 2px solid var(--text-main);
+      background: transparent;
+      color: var(--text-main);
+      font-family: inherit;
+      padding: 10px 8px;
+      font-size: 0.58rem;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 2px 2px 0 var(--text-main);
+    }
+    .retro-menu-item.selected, .retro-menu-item:active {
+      background: var(--text-main);
+      color: var(--lcd-bg);
+    }
+
+    .retro-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--text-main);
+      color: var(--lcd-bg);
+      border: 2px solid var(--lcd-bg);
+      font-family: inherit;
+      font-size: 0.65rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #000;
+      margin-top: 6px;
+    }
+    .retro-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 #000;
+    }
+
+    .retro-btn-secondary {
+      background: transparent;
+      color: var(--text-main);
+      border: 2px solid var(--text-main);
+      box-shadow: 2px 2px 0 var(--text-main);
+    }
+
+    /* Desktop View Center Bezel */
+    @media (min-width: 500px) {
+      body {
+        background: radial-gradient(circle at 50% 50%, #1f2430 0%, #0d0f14 100%);
+      }
+      #console-shell {
+        border-radius: 20px 20px 45px 20px;
+        height: 96vh;
+        margin: 2vh auto;
+        border: 4px solid var(--casing-shadow);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 20px 40px rgba(0, 0, 0, 0.8);
+      }
+    }
+  </style>
+</head>
+<body class="theme-dmg">
+
+  <!-- Main Game Boy Handheld Console Shell -->
+  <div id="console-shell">
+
+    <!-- Top Grooves -->
+    <div class="casing-grooves">
+      <div class="groove"></div>
+      <div class="groove"></div>
+    </div>
+
+    <!-- Screen Bezel (Outer Frame) -->
+    <div id="screen-bezel">
+
+      <!-- Top Decals: Dual Color Stripes & Battery LED -->
+      <div class="bezel-top-bar">
+        <div class="bezel-stripes">
+          <div class="stripe-burgundy"></div>
+          <div class="stripe-blue"></div>
+        </div>
+
+        <div class="bezel-title">
+          <span>TETRIX RETRO</span>
+        </div>
+
+        <div class="battery-group">
+          <div class="battery-led"></div>
+          <span>BATTERY</span>
+        </div>
+      </div>
+
+      <!-- Authentic LCD Screen Display -->
+      <div id="lcd-display">
+
+        <!-- LCD Screen Header -->
+        <div class="screen-header">
+          <span class="logo-badge">1989 8-BIT</span>
+          <div class="screen-header-btns">
+            <button id="btn-toggle-music" class="retro-icon-btn" title="Música BGM">♪</button>
+            <button id="btn-toggle-sound" class="retro-icon-btn" title="Efeitos SFX">🔊</button>
+            <button id="btn-pause-header" class="retro-icon-btn" title="Pausar">II</button>
+          </div>
+        </div>
+
+        <!-- LCD Screen Play Area -->
+        <div id="lcd-play-area">
+
+          <!-- Left Column: Hold & Score & Level -->
+          <div class="retro-side-panel">
+            <div class="retro-box">
+              <div class="retro-label">HOLD</div>
+              <canvas id="hold-canvas" class="retro-preview" width="60" height="48"></canvas>
+            </div>
+
+            <div class="retro-box">
+              <div class="retro-label">SCORE</div>
+              <div id="ui-score" class="retro-val">0</div>
+            </div>
+
+            <div class="retro-box">
+              <div class="retro-label">LEVEL</div>
+              <div id="ui-level" class="retro-val">1</div>
+            </div>
+
+            <div class="retro-box" id="card-mode-target">
+              <div id="ui-mode-label" class="retro-label">LINES</div>
+              <div id="ui-lines" class="retro-val">0</div>
+            </div>
+          </div>
+
+          <!-- Center: Board Canvas -->
+          <div id="board-wrapper">
+            <div id="board-frame">
+              <div id="danger-indicator"></div>
+              <canvas id="board-canvas"></canvas>
+              <div id="retro-banner">TETRIS!</div>
+              <div id="countdown-overlay">3</div>
+            </div>
+          </div>
+
+          <!-- Right Column: Next & Top Score & Timer -->
+          <div class="retro-side-panel">
+            <div class="retro-box">
+              <div class="retro-label">NEXT</div>
+              <canvas id="next-canvas-1" class="retro-next-box" width="60" height="38"></canvas>
+              <canvas id="next-canvas-2" class="retro-next-box" width="60" height="38"></canvas>
+            </div>
+
+            <div class="retro-box">
+              <div class="retro-label">TOP</div>
+              <div id="ui-highscore" class="retro-val">0</div>
+            </div>
+
+            <div class="retro-box" id="card-timer" style="display:none;">
+              <div class="retro-label">TIME</div>
+              <div id="ui-timer" class="retro-val">02:00</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Handheld Console Brand Logos -->
+    <div class="casing-brand">
+      <span class="brand-nintendo-style">Retro Boy™</span>
+      <span class="brand-model-style">DMG-01</span>
+    </div>
+
+    <!-- Quick helper / theme toggle line -->
+    <div class="casing-controls-helper">
+      <span>D-PAD: ◀ ▶ ▼ ⚡DROP</span>
+      <button id="btn-cycle-theme" class="helper-toggle">TEMA: DMG VERDE ▾</button>
+    </div>
+
+    <!-- GAMEPAD AREA (Handheld Physical Controls) -->
+    <div id="gamepad-area">
+
+      <div class="gamepad-upper-row">
+
+        <!-- Classic D-PAD Cross -->
+        <div class="dpad-cross">
+          <button id="btn-hard-drop" class="dpad-btn dpad-up" aria-label="Drop Instantâneo">
+            <span class="btn-sublabel">DROP</span>
+            ▲
+          </button>
+          <button id="btn-move-left" class="dpad-btn dpad-left" aria-label="Mover Esquerda">◀</button>
+          <div class="dpad-center"></div>
+          <button id="btn-move-right" class="dpad-btn dpad-right" aria-label="Mover Direita">▶</button>
+          <button id="btn-soft-drop" class="dpad-btn dpad-down" aria-label="Descer Peça">▼</button>
+        </div>
+
+        <!-- Classic A & B Action Buttons -->
+        <div class="actions-cluster">
+          <div class="round-btn-wrapper">
+            <button id="btn-rotate-ccw" class="retro-round-btn btn-b" aria-label="Girar Anti-horário">B</button>
+            <span class="btn-label-retro">↺ ESQ</span>
+          </div>
+
+          <div class="round-btn-wrapper">
+            <button id="btn-rotate-cw" class="retro-round-btn btn-a" aria-label="Girar Horário">A</button>
+            <span class="btn-label-retro">GIRAR</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Lower Row: SELECT (Hold) & START (Pause/Play) -->
+      <div class="gamepad-lower-row">
+        <div class="pill-btn-group">
+          <button id="btn-hold" class="retro-pill-btn" aria-label="Guardar Peça"></button>
+          <span class="pill-label">SELECT (HOLD)</span>
+        </div>
+
+        <div class="pill-btn-group">
+          <button id="btn-start-pause" class="retro-pill-btn" aria-label="Iniciar / Pausar"></button>
+          <span class="pill-label">START (PAUSE)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Speaker Grille Accent -->
+    <div class="speaker-grille">
+      <div class="grille-line"></div>
+      <div class="grille-line"></div>
+      <div class="grille-line"></div>
+      <div class="grille-line"></div>
+    </div>
+
+    <!-- MODAL: Main Menu -->
+    <div id="modal-menu" class="retro-modal-overlay active">
+      <div class="retro-modal-card">
+        <h1 class="retro-modal-title">TETRIX 8-BIT</h1>
+        <p class="retro-modal-subtitle">O clássico do Game Boy recriado para o seu celular</p>
+
+        <div class="retro-menu-list">
+          <div class="retro-menu-item selected" data-mode="marathon">
+            <span>► MARATONA</span>
+            <span>LV 1-15</span>
+          </div>
+          <div class="retro-menu-item" data-mode="sprint">
+            <span>► SPRINT 40</span>
+            <span>TEMPO</span>
+          </div>
+          <div class="retro-menu-item" data-mode="ultra">
+            <span>► ULTRA 2 MIN</span>
+            <span>PONTOS</span>
+          </div>
+        </div>
+
+        <button id="btn-start-game" class="retro-btn">PRESS START</button>
+        <button id="btn-menu-theme" class="retro-btn retro-btn-secondary">TROCAR TEMA RETRÔ</button>
+      </div>
+    </div>
+
+    <!-- MODAL: Pause -->
+    <div id="modal-pause" class="retro-modal-overlay">
+      <div class="retro-modal-card">
+        <h2 class="retro-modal-title">PAUSE</h2>
+        <p class="retro-modal-subtitle">Jogo pausado</p>
+
+        <button id="btn-resume-game" class="retro-btn">CONTINUAR</button>
+        <button id="btn-restart-game" class="retro-btn retro-btn-secondary">REINICIAR</button>
+        <button id="btn-quit-game" class="retro-btn retro-btn-secondary">MENU PRINCIPAL</button>
+      </div>
+    </div>
+
+    <!-- MODAL: Game Over -->
+    <div id="modal-gameover" class="retro-modal-overlay">
+      <div class="retro-modal-card">
+        <h2 id="gov-title" class="retro-modal-title">GAME OVER</h2>
+        <p id="gov-sub" class="retro-modal-subtitle">Excelente partida!</p>
+
+        <div style="border: 2px dashed var(--text-main); padding: 8px; margin-bottom: 12px; font-size: 0.58rem; text-align: left; line-height: 1.8;">
+          <div>SCORE : <span id="gov-score">0</span></div>
+          <div>LINES : <span id="gov-lines">0</span></div>
+          <div>LEVEL : <span id="gov-level">1</span></div>
+          <div>TOP   : <span id="gov-highscore">0</span></div>
+        </div>
+
+        <button id="btn-play-again" class="retro-btn">JOGAR DE NOVO</button>
+        <button id="btn-gov-menu" class="retro-btn retro-btn-secondary">MENU</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  /**
+   * TETRIX RETRO 8-BIT ENGINE
+   * Pure Chiptune Web Audio Synthesizer, 8-Bit Noise Channel,
+   * Game Boy / NES Block Rendering, SRS Kicks, Lock Delay, Touch D-Pad with DAS/ARR.
+   */
+
+  // --- RETRO CHIPTUNE SOUND ENGINE ---
+  class RetroSoundEngine {
+    constructor() {
+      this.ctx = null;
+      this.soundEnabled = true;
+      this.musicEnabled = true;
+      this.musicInterval = null;
+      this.initialized = false;
+    }
+
+    init() {
+      if (this.initialized) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+        this.initialized = true;
+      } catch (e) {}
+    }
+
+    resume() {
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+
+    // Pure 8-bit pulse/square tone
+    playTone(freq, type = 'square', duration = 0.06, volume = 0.2) {
+      if (!this.soundEnabled || !this.ctx) return;
+      this.resume();
+      try {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {}
+    }
+
+    // 8-Bit Noise Generator for Hard Drop and Explosions
+    playNoise(duration = 0.08, volume = 0.25) {
+      if (!this.soundEnabled || !this.ctx) return;
+      this.resume();
+      try {
+        const sampleRate = this.ctx.sampleRate;
+        const bufferSize = Math.floor(sampleRate * duration);
+        const buffer = this.ctx.createBuffer(1, bufferSize, sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1; // Pure retro white/pink noise
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1200, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + duration);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(volume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        noise.start();
+      } catch (e) {}
+    }
+
+    playMove() {
+      // 8-bit move blip
+      this.playTone(392, 'square', 0.025, 0.12);
+    }
+
+    playRotate() {
+      // Quick retro chirp
+      if (!this.soundEnabled || !this.ctx) return;
+      this.resume();
+      try {
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(660, now + 0.025);
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.05);
+      } catch (e) {}
+    }
+
+    playHold() {
+      this.playTone(587, 'square', 0.05, 0.15);
+    }
+
+    playSoftDrop() {
+      this.playTone(220, 'triangle', 0.02, 0.1);
+    }
+
+    playHardDrop() {
+      // Crisp 8-bit snare thud
+      this.playNoise(0.09, 0.35);
+      this.playTone(90, 'square', 0.06, 0.3);
+    }
+
+    playLineClear(lines) {
+      if (!this.soundEnabled || !this.ctx) return;
+      this.resume();
+
+      if (lines === 4) {
+        // Triumphant 8-Bit TETRIS Fanfare!
+        const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => {
+            this.playTone(freq, 'square', 0.22, 0.25);
+          }, idx * 60);
+        });
+      } else {
+        const notes = [330, 440, 550];
+        notes.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 'square', 0.08, 0.2), idx * 45);
+        });
+      }
+    }
+
+    playLevelUp() {
+      const notes = [392, 523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => this.playTone(freq, 'square', 0.12, 0.25), idx * 65);
+      });
+    }
+
+    playGameOver() {
+      const notes = [440, 415.3, 392, 369.99, 349.23, 220];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => this.playTone(freq, 'sawtooth', 0.16, 0.2), idx * 80);
+      });
+    }
+
+    // --- KOROBEINIKI 8-BIT CHIPTUNE BGM ---
+    startMusic() {
+      if (!this.musicEnabled || !this.initialized || this.musicInterval) return;
+
+      const N = {
+        E5: 659.25, B4: 493.88, C5: 523.25, D5: 587.33,
+        A4: 440.00, G4: 392.00, F4: 349.23, E4: 329.63,
+        Gsharp4: 415.30, REST: 0
+      };
+
+      const melody = [
+        { n: N.E5, d: 2 }, { n: N.B4, d: 1 }, { n: N.C5, d: 1 }, { n: N.D5, d: 2 },
+        { n: N.C5, d: 1 }, { n: N.B4, d: 1 }, { n: N.A4, d: 2 }, { n: N.A4, d: 1 },
+        { n: N.C5, d: 1 }, { n: N.E5, d: 2 }, { n: N.D5, d: 1 }, { n: N.C5, d: 1 },
+        { n: N.B4, d: 3 }, { n: N.C5, d: 1 }, { n: N.D5, d: 2 }, { n: N.E5, d: 2 },
+        { n: N.C5, d: 2 }, { n: N.A4, d: 2 }, { n: N.A4, d: 2 }, { n: N.REST, d: 2 },
+
+        { n: N.D5, d: 3 }, { n: N.F4 * 2, d: 1 }, { n: N.A4 * 2, d: 2 }, { n: N.G4 * 2, d: 1 },
+        { n: N.F4 * 2, d: 1 }, { n: N.E5, d: 3 }, { n: N.C5, d: 1 }, { n: N.E5, d: 2 },
+        { n: N.D5, d: 1 }, { n: N.C5, d: 1 }, { n: N.B4, d: 2 }, { n: N.B4, d: 1 },
+        { n: N.C5, d: 1 }, { n: N.D5, d: 2 }, { n: N.E5, d: 2 }, { n: N.C5, d: 2 },
+        { n: N.A4, d: 2 }, { n: N.A4, d: 2 }, { n: N.REST, d: 2 }
+      ];
+
+      let noteIdx = 0;
+      const stepTime = 138;
+
+      const playNext = () => {
+        if (!this.musicEnabled || !this.ctx) return;
+        this.resume();
+
+        const item = melody[noteIdx];
+        if (item.n > 0) {
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+
+            osc.type = 'square'; // Authentic Game Boy pulse channel
+            osc.frequency.setValueAtTime(item.n, now);
+
+            const dur = (item.d * stepTime) / 1000;
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + dur * 0.95);
+
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+
+            osc.start(now);
+            osc.stop(now + dur);
+          } catch(e) {}
+        }
+
+        const wait = item.d * stepTime;
+        noteIdx = (noteIdx + 1) % melody.length;
+        this.musicInterval = setTimeout(playNext, wait);
+      };
+
+      playNext();
+    }
+
+    stopMusic() {
+      if (this.musicInterval) {
+        clearTimeout(this.musicInterval);
+        this.musicInterval = null;
+      }
+    }
+  }
+
+  // --- HAPTICS HELPER ---
+  function triggerHaptic(type = 'light') {
+    if (!navigator.vibrate) return;
+    try {
+      if (type === 'light') navigator.vibrate(8);
+      else if (type === 'medium') navigator.vibrate(25);
+      else if (type === 'heavy') navigator.vibrate([30, 20, 35]);
+      else if (type === 'tetris') navigator.vibrate([40, 30, 50, 30, 80]);
+    } catch(e) {}
+  }
+
+  // --- TETRIS CONSTANTS & SRS DATA ---
+  const COLS = 10;
+  const ROWS = 20;
+
+  // Authentic 7 Tetromino shapes and their retro patterns
+  // In classic Game Boy Tetris:
+  // pattern 1: outer square with hollow inner dot
+  // pattern 2: solid filled with highlight
+  // pattern 3: cross/checkered
+  const TETROMINOES = {
+    I: {
+      shape: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
+      pattern: 'hollow',
+      nesColor: '#00e8d8' // Cyan
+    },
+    J: {
+      shape: [[1,0,0],[1,1,1],[0,0,0]],
+      pattern: 'solid',
+      nesColor: '#0058f8' // Blue
+    },
+    L: {
+      shape: [[0,0,1],[1,1,1],[0,0,0]],
+      pattern: 'cross',
+      nesColor: '#f87800' // Orange
+    },
+    O: {
+      shape: [[1,1],[1,1]],
+      pattern: 'hollow',
+      nesColor: '#f8b800' // Yellow
+    },
+    S: {
+      shape: [[0,1,1],[1,1,0],[0,0,0]],
+      pattern: 'cross',
+      nesColor: '#00a800' // Green
+    },
+    T: {
+      shape: [[0,1,0],[1,1,1],[0,0,0]],
+      pattern: 'solid',
+      nesColor: '#d800cc' // Magenta
+    },
+    Z: {
+      shape: [[1,1,0],[0,1,1],[0,0,0]],
+      pattern: 'cross',
+      nesColor: '#f83800' // Red
+    }
+  };
+
+  const WALL_KICKS = {
+    JLSTZ: {
+      '0->1': [[0,0], [-1,0], [-1,1], [0,-2], [-1,-2]],
+      '1->0': [[0,0], [1,0], [1,-1], [0,2], [1,2]],
+      '1->2': [[0,0], [1,0], [1,-1], [0,2], [1,2]],
+      '2->1': [[0,0], [-1,0], [-1,1], [0,-2], [-1,-2]],
+      '2->3': [[0,0], [1,0], [1,1], [0,-2], [1,-2]],
+      '3->2': [[0,0], [-1,0], [-1,-1], [0,2], [-1,2]],
+      '3->0': [[0,0], [-1,0], [-1,-1], [0,2], [-1,2]],
+      '0->3': [[0,0], [1,0], [1,1], [0,-2], [1,-2]]
+    },
+    I: {
+      '0->1': [[0,0], [-2,0], [1,0], [-2,-1], [1,2]],
+      '1->0': [[0,0], [2,0], [-1,0], [2,1], [-1,-2]],
+      '1->2': [[0,0], [-1,0], [2,0], [-1,2], [2,-1]],
+      '2->1': [[0,0], [1,0], [-2,0], [1,-2], [-2,1]],
+      '2->3': [[0,0], [2,0], [-1,0], [2,1], [-1,-2]],
+      '3->2': [[0,0], [-2,0], [1,0], [-2,-1], [1,2]],
+      '3->0': [[0,0], [1,0], [-2,0], [1,-2], [-2,1]],
+      '0->3': [[0,0], [-1,0], [2,0], [-1,2], [2,-1]]
+    }
+  };
+
+  // --- RETRO GAME CONTROLLER ---
+  class TetrixRetro {
+    constructor() {
+      this.sound = new RetroSoundEngine();
+
+      this.boardCanvas = document.getElementById('board-canvas');
+      this.boardCtx = this.boardCanvas.getContext('2d');
+      this.holdCanvas = document.getElementById('hold-canvas');
+      this.holdCtx = this.holdCanvas.getContext('2d');
+      this.nextCanvases = [
+        document.getElementById('next-canvas-1'),
+        document.getElementById('next-canvas-2')
+      ];
+      this.nextCtxs = this.nextCanvases.map(c => c.getContext('2d'));
+
+      this.uiScore = document.getElementById('ui-score');
+      this.uiLevel = document.getElementById('ui-level');
+      this.uiLines = document.getElementById('ui-lines');
+      this.uiHighscore = document.getElementById('ui-highscore');
+      this.uiModeLabel = document.getElementById('ui-mode-label');
+      this.uiTimer = document.getElementById('ui-timer');
+      this.cardTimer = document.getElementById('card-timer');
+      this.dangerIndicator = document.getElementById('danger-indicator');
+      this.retroBanner = document.getElementById('retro-banner');
+      this.countdownOverlay = document.getElementById('countdown-overlay');
+
+      this.modalMenu = document.getElementById('modal-menu');
+      this.modalPause = document.getElementById('modal-pause');
+      this.modalGameOver = document.getElementById('modal-gameover');
+
+      // State
+      this.grid = [];
+      this.currentPiece = null;
+      this.pieceX = 0;
+      this.pieceY = 0;
+      this.pieceRotation = 0;
+      this.holdPieceType = null;
+      this.canHold = true;
+      this.bag = [];
+      this.nextQueue = [];
+
+      this.score = 0;
+      this.lines = 0;
+      this.level = 1;
+      this.highScore = 0;
+      this.mode = 'marathon';
+      this.combo = -1;
+      this.b2b = false;
+
+      this.isRunning = false;
+      this.isPaused = false;
+      this.dropCounter = 0;
+      this.dropInterval = 900;
+      this.lastTime = 0;
+      this.lockDelay = 500;
+      this.lockTimer = 0;
+      this.isLocking = false;
+      this.lockResets = 0;
+      this.maxLockResets = 15;
+
+      this.modeTimeRemaining = 120;
+      this.elapsedTime = 0;
+      this.blockSize = 20;
+
+      // Themes: 'dmg' (Classic Green), 'nes' (Arcade Color), 'pocket' (B&W LCD), 'synth' (Cyberpunk)
+      this.currentTheme = 'dmg';
+      this.themeList = ['dmg', 'nes', 'pocket', 'synth'];
+      this.themeNames = {
+        dmg: 'DMG VERDE ▾',
+        nes: 'NES COLOR ▾',
+        pocket: 'POCKET B&W ▾',
+        synth: 'SYNTH 80s ▾'
+      };
+
+      this.loadSettings();
+      this.initEvents();
+      this.resizeCanvas();
+      window.addEventListener('resize', () => this.resizeCanvas());
+    }
+
+    loadSettings() {
+      try {
+        const savedTheme = localStorage.getItem('tetrix_retro_theme') || 'dmg';
+        this.setTheme(savedTheme);
+        const high = localStorage.getItem('tetrix_retro_high_' + this.mode) || 0;
+        this.highScore = parseInt(high, 10);
+        this.uiHighscore.textContent = this.highScore.toString();
+      } catch (e) {}
+    }
+
+    saveSettings() {
+      try {
+        localStorage.setItem('tetrix_retro_theme', this.currentTheme);
+        localStorage.setItem('tetrix_retro_high_' + this.mode, this.highScore.toString());
+      } catch (e) {}
+    }
+
+    setTheme(theme) {
+      this.currentTheme = theme;
+      document.body.className = '';
+      if (theme !== 'dmg') {
+        document.body.classList.add('theme-' + theme);
+      }
+      const btn = document.getElementById('btn-cycle-theme');
+      if (btn) btn.textContent = 'TEMA: ' + this.themeNames[theme];
+      this.saveSettings();
+      if (this.boardCanvas) this.draw();
+    }
+
+    cycleTheme() {
+      const idx = this.themeList.indexOf(this.currentTheme);
+      const nextTheme = this.themeList[(idx + 1) % this.themeList.length];
+      this.setTheme(nextTheme);
+      triggerHaptic('light');
+    }
+
+    resizeCanvas() {
+      const wrapper = document.getElementById('board-wrapper');
+      if (!wrapper) return;
+
+      const availWidth = wrapper.clientWidth - 4;
+      const availHeight = wrapper.clientHeight - 4;
+
+      let sizeByHeight = Math.floor(availHeight / 20);
+      let sizeByWidth = Math.floor(availWidth / 10);
+      this.blockSize = Math.max(14, Math.min(sizeByHeight, sizeByWidth));
+
+      const w = this.blockSize * COLS;
+      const h = this.blockSize * ROWS;
+
+      const dpr = window.devicePixelRatio || 1;
+      this.boardCanvas.width = w * dpr;
+      this.boardCanvas.height = h * dpr;
+      this.boardCanvas.style.width = w + 'px';
+      this.boardCanvas.style.height = h + 'px';
+
+      this.boardCtx.resetTransform();
+      this.boardCtx.scale(dpr, dpr);
+      this.boardCtx.imageSmoothingEnabled = false;
+
+      this.draw();
+    }
+
+    refillBag() {
+      const pieces = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+      for (let i = pieces.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pieces[i], pieces[j]] = [pieces[j], pieces[i]];
+      }
+      this.bag.push(...pieces);
+    }
+
+    getNextPiece() {
+      if (this.bag.length < 7) this.refillBag();
+      return this.bag.shift();
+    }
+
+    startNewGame(mode = 'marathon') {
+      this.sound.init();
+      this.mode = mode;
+      this.grid = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+      this.score = 0;
+      this.lines = 0;
+      this.level = 1;
+      this.combo = -1;
+      this.b2b = false;
+      this.holdPieceType = null;
+      this.canHold = true;
+      this.bag = [];
+      this.nextQueue = [];
+
+      this.modeTimeRemaining = 120;
+      this.elapsedTime = 0;
+      this.cardTimer.style.display = (mode === 'ultra' || mode === 'sprint') ? 'block' : 'none';
+      this.uiModeLabel.textContent = (mode === 'sprint') ? 'REST' : 'LINES';
+
+      const high = localStorage.getItem('tetrix_retro_high_' + this.mode) || 0;
+      this.highScore = parseInt(high, 10);
+      this.uiHighscore.textContent = this.highScore.toString();
+
+      this.updateDropInterval();
+      this.updateUI();
+
+      for (let i = 0; i < 3; i++) {
+        this.nextQueue.push(this.getNextPiece());
+      }
+
+      this.modalMenu.classList.remove('active');
+      this.modalPause.classList.remove('active');
+      this.modalGameOver.classList.remove('active');
+
+      this.runCountdown(() => {
+        this.spawnPiece();
+        this.isRunning = true;
+        this.isPaused = false;
+        this.lastTime = performance.now();
+        this.sound.startMusic();
+        requestAnimationFrame((t) => this.gameLoop(t));
+      });
+    }
+
+    runCountdown(onComplete) {
+      let count = 3;
+      this.countdownOverlay.textContent = count;
+      this.countdownOverlay.style.display = 'flex';
+      this.sound.playTone(440, 'square', 0.08, 0.25);
+
+      const timer = setInterval(() => {
+        count--;
+        if (count > 0) {
+          this.countdownOverlay.textContent = count;
+          this.sound.playTone(440, 'square', 0.08, 0.25);
+        } else if (count === 0) {
+          this.countdownOverlay.textContent = 'GO!';
+          this.sound.playTone(880, 'square', 0.15, 0.35);
+        } else {
+          clearInterval(timer);
+          this.countdownOverlay.style.display = 'none';
+          onComplete();
+        }
+      }, 550);
+    }
+
+    updateDropInterval() {
+      // Classic progression: starts at 880ms, scales smoothly down to 60ms
+      this.dropInterval = Math.max(60, 880 * Math.pow(0.86, this.level - 1));
+    }
+
+    spawnPiece(pieceType = null) {
+      const type = pieceType || this.nextQueue.shift();
+      if (!pieceType) {
+        this.nextQueue.push(this.getNextPiece());
+      }
+
+      this.currentPiece = {
+        type: type,
+        matrix: TETROMINOES[type].shape,
+        pattern: TETROMINOES[type].pattern,
+        nesColor: TETROMINOES[type].nesColor
+      };
+
+      this.pieceRotation = 0;
+      this.pieceX = Math.floor((COLS - this.currentPiece.matrix[0].length) / 2);
+      this.pieceY = (type === 'I') ? -1 : 0;
+      this.canHold = true;
+      this.isLocking = false;
+      this.lockTimer = 0;
+      this.lockResets = 0;
+
+      if (this.checkCollision(this.pieceX, this.pieceY, this.currentPiece.matrix)) {
+        this.gameOver();
+      }
+
+      this.drawHoldPreview();
+      this.drawNextPreviews();
+    }
+
+    checkCollision(x, y, matrix) {
+      for (let r = 0; r < matrix.length; r++) {
+        for (let c = 0; c < matrix[r].length; c++) {
+          if (matrix[r][c]) {
+            const newX = x + c;
+            const newY = y + r;
+            if (newX < 0 || newX >= COLS || newY >= ROWS) return true;
+            if (newY >= 0 && this.grid[newY][newX]) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    rotateMatrix(matrix, dir) {
+      const N = matrix.length;
+      const res = Array.from({ length: N }, () => Array(N).fill(0));
+      if (dir === 1) { // CW
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) res[c][N - 1 - r] = matrix[r][c];
+        }
+      } else { // CCW
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) res[N - 1 - c][r] = matrix[r][c];
+        }
+      }
+      return res;
+    }
+
+    rotatePiece(dir = 1) {
+      if (!this.currentPiece || !this.isRunning || this.isPaused) return;
+      const type = this.currentPiece.type;
+      if (type === 'O') return;
+
+      const oldRot = this.pieceRotation;
+      const newRot = (oldRot + (dir === 1 ? 1 : 3)) % 4;
+      const rotated = this.rotateMatrix(this.currentPiece.matrix, dir);
+      const testKey = `${oldRot}->${newRot}`;
+      const kickTable = (type === 'I') ? WALL_KICKS.I[testKey] : WALL_KICKS.JLSTZ[testKey];
+
+      for (let i = 0; i < kickTable.length; i++) {
+        const [kx, ky] = kickTable[i];
+        const tx = this.pieceX + kx;
+        const ty = this.pieceY - ky;
+        if (!this.checkCollision(tx, ty, rotated)) {
+          this.currentPiece.matrix = rotated;
+          this.pieceX = tx;
+          this.pieceY = ty;
+          this.pieceRotation = newRot;
+          this.sound.playRotate();
+          triggerHaptic('light');
+
+          if (this.isLocking && this.lockResets < this.maxLockResets) {
+            this.lockTimer = 0;
+            this.lockResets++;
+          }
+          return;
+        }
+      }
+    }
+
+    moveHorizontal(dir) {
+      if (!this.currentPiece || !this.isRunning || this.isPaused) return;
+      if (!this.checkCollision(this.pieceX + dir, this.pieceY, this.currentPiece.matrix)) {
+        this.pieceX += dir;
+        this.sound.playMove();
+        triggerHaptic('light');
+
+        if (this.isLocking && this.lockResets < this.maxLockResets) {
+          this.lockTimer = 0;
+          this.lockResets++;
+        }
+      }
+    }
+
+    softDrop() {
+      if (!this.currentPiece || !this.isRunning || this.isPaused) return;
+      if (!this.checkCollision(this.pieceX, this.pieceY + 1, this.currentPiece.matrix)) {
+        this.pieceY += 1;
+        this.score += 1;
+        this.updateUI();
+        this.sound.playSoftDrop();
+      } else {
+        this.lockPiece();
+      }
+    }
+
+    hardDrop() {
+      if (!this.currentPiece || !this.isRunning || this.isPaused) return;
+      let dropped = 0;
+      while (!this.checkCollision(this.pieceX, this.pieceY + 1, this.currentPiece.matrix)) {
+        this.pieceY += 1;
+        dropped++;
+      }
+      this.score += dropped * 2;
+      this.sound.playHardDrop();
+      triggerHaptic('heavy');
+      this.lockPiece();
+    }
+
+    hold() {
+      if (!this.currentPiece || !this.canHold || !this.isRunning || this.isPaused) return;
+      const curType = this.currentPiece.type;
+      this.sound.playHold();
+      triggerHaptic('light');
+
+      if (!this.holdPieceType) {
+        this.holdPieceType = curType;
+        this.spawnPiece();
+      } else {
+        const next = this.holdPieceType;
+        this.holdPieceType = curType;
+        this.spawnPiece(next);
+      }
+      this.canHold = false;
+      this.drawHoldPreview();
+    }
+
+    getGhostY() {
+      if (!this.currentPiece) return 0;
+      let gy = this.pieceY;
+      while (!this.checkCollision(this.pieceX, gy + 1, this.currentPiece.matrix)) {
+        gy++;
+      }
+      return gy;
+    }
+
+    lockPiece() {
+      if (!this.currentPiece) return;
+
+      for (let r = 0; r < this.currentPiece.matrix.length; r++) {
+        for (let c = 0; c < this.currentPiece.matrix[r].length; c++) {
+          if (this.currentPiece.matrix[r][c]) {
+            const gx = this.pieceX + c;
+            const gy = this.pieceY + r;
+            if (gy >= 0 && gy < ROWS && gx >= 0 && gx < COLS) {
+              this.grid[gy][gx] = {
+                pattern: this.currentPiece.pattern,
+                nesColor: this.currentPiece.nesColor
+              };
+            }
+          }
+        }
+      }
+
+      this.currentPiece = null;
+      this.clearLines();
+    }
+
+    clearLines() {
+      const fullRows = [];
+      for (let r = 0; r < ROWS; r++) {
+        if (this.grid[r].every(cell => cell !== 0)) {
+          fullRows.push(r);
+        }
+      }
+
+      if (fullRows.length === 0) {
+        this.combo = -1;
+        this.spawnPiece();
+        return;
+      }
+
+      this.combo++;
+      const count = fullRows.length;
+      this.lines += count;
+
+      let points = 0;
+      let label = '';
+      if (count === 1) { points = 100 * this.level; label = 'SINGLE! +100'; }
+      else if (count === 2) { points = 300 * this.level; label = 'DOUBLE! +300'; }
+      else if (count === 3) { points = 500 * this.level; label = 'TRIPLE! +500'; }
+      else if (count === 4) {
+        if (this.b2b) {
+          points = 1200 * this.level;
+          label = 'B2B TETRIS!';
+        } else {
+          points = 800 * this.level;
+          label = 'TETRIS! +800';
+        }
+        this.b2b = true;
+        triggerHaptic('tetris');
+      }
+
+      if (count < 4) {
+        this.b2b = false;
+        triggerHaptic('medium');
+      }
+
+      if (this.combo > 0) {
+        points += 50 * this.combo * this.level;
+      }
+
+      this.score += points;
+      this.sound.playLineClear(count);
+
+      const nextLvl = Math.floor(this.lines / 10) + 1;
+      if (nextLvl > this.level && this.mode === 'marathon') {
+        this.level = nextLvl;
+        this.sound.playLevelUp();
+        this.showBanner('LV UP! ' + this.level);
+        this.updateDropInterval();
+      } else {
+        this.showBanner(label);
+      }
+
+      for (let i = 0; i < fullRows.length; i++) {
+        const row = fullRows[i];
+        this.grid.splice(row, 1);
+        this.grid.unshift(Array(COLS).fill(0));
+      }
+
+      if (this.mode === 'sprint' && this.lines >= 40) {
+        this.gameOver(true);
+        return;
+      }
+
+      this.updateUI();
+      this.spawnPiece();
+    }
+
+    showBanner(text) {
+      this.retroBanner.textContent = text;
+      this.retroBanner.classList.add('show');
+      setTimeout(() => this.retroBanner.classList.remove('show'), 800);
+    }
+
+    updateUI() {
+      this.uiScore.textContent = this.score.toString();
+      this.uiLevel.textContent = this.level.toString();
+
+      if (this.mode === 'sprint') {
+        this.uiLines.textContent = Math.max(0, 40 - this.lines).toString();
+      } else {
+        this.uiLines.textContent = this.lines.toString();
+      }
+
+      if (this.score > this.highScore) {
+        this.highScore = this.score;
+        this.saveSettings();
+      }
+      this.uiHighscore.textContent = this.highScore.toString();
+
+      let topRow = ROWS;
+      for (let r = 0; r < ROWS; r++) {
+        if (this.grid[r].some(c => c !== 0)) {
+          topRow = r;
+          break;
+        }
+      }
+      this.dangerIndicator.style.opacity = (topRow <= 5) ? '1' : '0';
+    }
+
+    pauseGame() {
+      if (!this.isRunning || this.isPaused) return;
+      this.isPaused = true;
+      this.sound.stopMusic();
+      this.modalPause.classList.add('active');
+    }
+
+    resumeGame() {
+      if (!this.isRunning || !this.isPaused) return;
+      this.modalPause.classList.remove('active');
+      this.isPaused = false;
+      this.lastTime = performance.now();
+      this.sound.startMusic();
+      requestAnimationFrame((t) => this.gameLoop(t));
+    }
+
+    gameOver(isVictory = false) {
+      this.isRunning = false;
+      this.sound.stopMusic();
+      this.sound.playGameOver();
+      triggerHaptic('heavy');
+
+      const govTitle = document.getElementById('gov-title');
+      const govSub = document.getElementById('gov-sub');
+
+      if (isVictory) {
+        govTitle.textContent = 'VICTORY!';
+        govSub.textContent = `Sprint 40 em ${this.formatTime(this.elapsedTime)}!`;
+      } else {
+        govTitle.textContent = 'GAME OVER';
+        govSub.textContent = (this.score >= this.highScore && this.score > 0)
+          ? 'NOVO RECORDE!'
+          : 'Tente mais uma vez!';
+      }
+
+      document.getElementById('gov-score').textContent = this.score.toString();
+      document.getElementById('gov-lines').textContent = this.lines.toString();
+      document.getElementById('gov-level').textContent = this.level.toString();
+      document.getElementById('gov-highscore').textContent = this.highScore.toString();
+
+      this.modalGameOver.classList.add('active');
+    }
+
+    formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    gameLoop(timestamp) {
+      if (!this.isRunning || this.isPaused) return;
+
+      const dt = timestamp - this.lastTime;
+      this.lastTime = timestamp;
+
+      if (this.mode === 'ultra') {
+        this.modeTimeRemaining -= dt / 1000;
+        this.uiTimer.textContent = this.formatTime(Math.max(0, this.modeTimeRemaining));
+        if (this.modeTimeRemaining <= 0) {
+          this.gameOver(false);
+          return;
+        }
+      } else if (this.mode === 'sprint') {
+        this.elapsedTime += dt / 1000;
+        this.uiTimer.textContent = this.formatTime(this.elapsedTime);
+      }
+
+      this.dropCounter += dt;
+      if (this.dropCounter >= this.dropInterval) {
+        this.dropCounter = 0;
+        if (this.currentPiece) {
+          if (!this.checkCollision(this.pieceX, this.pieceY + 1, this.currentPiece.matrix)) {
+            this.pieceY++;
+            this.isLocking = false;
+          } else {
+            this.isLocking = true;
+          }
+        }
+      }
+
+      if (this.isLocking && this.currentPiece) {
+        this.lockTimer += dt;
+        if (this.lockTimer >= this.lockDelay) {
+          this.lockPiece();
+        }
+      }
+
+      this.draw();
+      requestAnimationFrame((t) => this.gameLoop(t));
+    }
+
+    // --- DRAWING PIPELINE (RETRO PIXEL BLOCKS) ---
+    draw() {
+      const ctx = this.boardCtx;
+      const bSize = this.blockSize;
+
+      // Board Background
+      ctx.clearRect(0, 0, COLS * bSize, ROWS * bSize);
+
+      // Subtle retro grid dots
+      const isDmg = this.currentTheme === 'dmg';
+      const isPocket = this.currentTheme === 'pocket';
+      const gridDotColor = (isDmg || isPocket) ? 'rgba(15, 56, 15, 0.12)' : 'rgba(255, 255, 255, 0.08)';
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          ctx.fillStyle = gridDotColor;
+          ctx.fillRect(c * bSize + bSize - 1, r * bSize + bSize - 1, 1, 1);
+        }
+      }
+
+      // Draw Locked Grid
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = this.grid[r][c];
+          if (cell) {
+            this.drawRetroBlock(ctx, c * bSize, r * bSize, bSize, cell.pattern, cell.nesColor);
+          }
+        }
+      }
+
+      // Draw Ghost Piece (Retro Dotted Outline)
+      if (this.currentPiece) {
+        const ghostY = this.getGhostY();
+        const matrix = this.currentPiece.matrix;
+        for (let r = 0; r < matrix.length; r++) {
+          for (let c = 0; c < matrix[r].length; c++) {
+            if (matrix[r][c]) {
+              const gx = (this.pieceX + c) * bSize;
+              const gy = (ghostY + r) * bSize;
+              this.drawGhostBlock(ctx, gx, gy, bSize);
+            }
+          }
+        }
+      }
+
+      // Draw Current Active Piece
+      if (this.currentPiece) {
+        const matrix = this.currentPiece.matrix;
+        for (let r = 0; r < matrix.length; r++) {
+          for (let c = 0; c < matrix[r].length; c++) {
+            if (matrix[r][c]) {
+              const px = (this.pieceX + c) * bSize;
+              const py = (this.pieceY + r) * bSize;
+              if (py >= 0) {
+                this.drawRetroBlock(ctx, px, py, bSize, this.currentPiece.pattern, this.currentPiece.nesColor);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Authentic Game Boy / NES Pixel Art Block
+    drawRetroBlock(ctx, x, y, size, pattern, nesColor) {
+      const isDmg = this.currentTheme === 'dmg';
+      const isPocket = this.currentTheme === 'pocket';
+      const isNes = this.currentTheme === 'nes';
+      const isSynth = this.currentTheme === 'synth';
+
+      // DMG Palette shades
+      const darkest = isPocket ? '#1a1e16' : (isNes ? '#000000' : (isSynth ? '#050510' : '#0f380f'));
+      const dark = isPocket ? '#586050' : (isNes ? nesColor : (isSynth ? '#ff007f' : '#306230'));
+      const light = isPocket ? '#9ea895' : (isNes ? '#ffffff' : (isSynth ? '#00f0ff' : '#8bac0f'));
+
+      ctx.save();
+
+      if (isNes) {
+        // NES 8-bit block style: black outline, vibrant color, white highlight
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(x, y, size, size);
+
+        ctx.fillStyle = nesColor;
+        ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
+
+        // White inner corner highlight
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(x + 2, y + 2, 2, 2);
+        ctx.fillRect(x + 3, y + 2, size - 6, 1);
+        ctx.fillRect(x + 2, y + 3, 1, size - 6);
+
+        // Shadow border bottom/right
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        ctx.fillRect(x + 1, y + size - 2, size - 2, 1);
+        ctx.fillRect(x + size - 2, y + 1, 1, size - 2);
+        ctx.restore();
+        return;
+      }
+
+      // 1989 Game Boy (DMG & Pocket) authentic block patterns:
+      // Outer 1-2px border
+      ctx.fillStyle = darkest;
+      ctx.fillRect(x, y, size, size);
+
+      if (pattern === 'hollow') {
+        // Square with light border & dark center dot (Iconic I and O piece pattern)
+        ctx.fillStyle = light;
+        ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
+
+        ctx.fillStyle = darkest;
+        const centerPad = Math.floor(size * 0.28);
+        ctx.fillRect(x + centerPad, y + centerPad, size - centerPad * 2, size - centerPad * 2);
+
+      } else if (pattern === 'cross') {
+        // Cross / Checkerboard patterned block (Iconic S, Z, L piece)
+        ctx.fillStyle = light;
+        ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
+
+        ctx.fillStyle = dark;
+        for (let py = 1; py < size - 1; py += 3) {
+          for (let px = 1; px < size - 1; px += 3) {
+            ctx.fillRect(x + px, y + py, 1, 1);
+          }
+        }
+      } else {
+        // Solid pattern with 1-pixel white/light highlight (T and J piece)
+        ctx.fillStyle = dark;
+        ctx.fillRect(x + 1, y + 1, size - 2, size - 2);
+
+        ctx.fillStyle = light;
+        ctx.fillRect(x + 2, y + 2, size - 4, 1);
+        ctx.fillRect(x + 2, y + 2, 1, size - 4);
+      }
+
+      ctx.restore();
+    }
+
+    // Ghost Block: Dotted outline
+    drawGhostBlock(ctx, x, y, size) {
+      const isDmg = this.currentTheme === 'dmg' || this.currentTheme === 'pocket';
+      ctx.strokeStyle = isDmg ? '#306230' : 'rgba(255, 255, 255, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + 1.5, y + 1.5, size - 3, size - 3);
+
+      // Subtle center dot
+      ctx.fillStyle = isDmg ? '#306230' : 'rgba(255, 255, 255, 0.3)';
+      ctx.fillRect(x + Math.floor(size / 2) - 1, y + Math.floor(size / 2) - 1, 2, 2);
+    }
+
+    drawHoldPreview() {
+      const ctx = this.holdCtx;
+      const w = this.holdCanvas.width;
+      const h = this.holdCanvas.height;
+      ctx.clearRect(0, 0, w, h);
+      if (!this.holdPieceType) return;
+      const piece = TETROMINOES[this.holdPieceType];
+      this.drawMiniPiece(ctx, piece.shape, piece.pattern, piece.nesColor, w, h, 10);
+    }
+
+    drawNextPreviews() {
+      for (let i = 0; i < 2; i++) {
+        const ctx = this.nextCtxs[i];
+        const canvas = this.nextCanvases[i];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const type = this.nextQueue[i];
+        if (type) {
+          const piece = TETROMINOES[type];
+          this.drawMiniPiece(ctx, piece.shape, piece.pattern, piece.nesColor, canvas.width, canvas.height, 9);
+        }
+      }
+    }
+
+    drawMiniPiece(ctx, matrix, pattern, nesColor, cw, ch, bSize) {
+      const rows = matrix.length;
+      const cols = matrix[0].length;
+      let minR = rows, maxR = -1, minC = cols, maxC = -1;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (matrix[r][c]) {
+            if (r < minR) minR = r;
+            if (r > maxR) maxR = r;
+            if (c < minC) minC = c;
+            if (c > maxC) maxC = c;
+          }
+        }
+      }
+
+      const pw = (maxC - minC + 1) * bSize;
+      const ph = (maxR - minR + 1) * bSize;
+      const ox = Math.floor((cw - pw) / 2) - minC * bSize;
+      const oy = Math.floor((ch - ph) / 2) - minR * bSize;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          if (matrix[r][c]) {
+            this.drawRetroBlock(ctx, ox + c * bSize, oy + r * bSize, bSize, pattern, nesColor);
+          }
+        }
+      }
+    }
+
+    // --- CONTROLS & EVENTS ---
+    initEvents() {
+      // Audio unlock on user touch/click
+      const unlockAudio = () => {
+        this.sound.init();
+        this.sound.resume();
+        window.removeEventListener('touchstart', unlockAudio);
+        window.removeEventListener('click', unlockAudio);
+      };
+      window.addEventListener('touchstart', unlockAudio, { passive: true });
+      window.addEventListener('click', unlockAudio, { passive: true });
+
+      // Theme toggle buttons
+      document.getElementById('btn-cycle-theme').addEventListener('click', () => this.cycleTheme());
+      document.getElementById('btn-menu-theme').addEventListener('click', () => this.cycleTheme());
+
+      // Top Screen buttons
+      document.getElementById('btn-toggle-music').addEventListener('click', () => {
+        this.sound.musicEnabled = !this.sound.musicEnabled;
+        if (this.sound.musicEnabled && this.isRunning && !this.isPaused) {
+          this.sound.startMusic();
+        } else {
+          this.sound.stopMusic();
+        }
+        document.getElementById('btn-toggle-music').style.opacity = this.sound.musicEnabled ? '1' : '0.4';
+        triggerHaptic('light');
+      });
+
+      document.getElementById('btn-toggle-sound').addEventListener('click', () => {
+        this.sound.soundEnabled = !this.sound.soundEnabled;
+        document.getElementById('btn-toggle-sound').style.opacity = this.sound.soundEnabled ? '1' : '0.4';
+        triggerHaptic('light');
+      });
+
+      document.getElementById('btn-pause-header').addEventListener('click', () => {
+        if (this.isRunning && !this.isPaused) this.pauseGame();
+        else if (this.isPaused) this.resumeGame();
+      });
+
+      // START & SELECT PILL BUTTONS
+      document.getElementById('btn-start-pause').addEventListener('click', () => {
+        if (!this.isRunning) {
+          this.startNewGame(this.mode);
+        } else if (this.isPaused) {
+          this.resumeGame();
+        } else {
+          this.pauseGame();
+        }
+      });
+
+      document.getElementById('btn-hold').addEventListener('click', () => this.hold());
+
+      // Menu Mode selector
+      let selectedMode = 'marathon';
+      document.querySelectorAll('.retro-menu-item').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.retro-menu-item').forEach(i => i.classList.remove('selected'));
+          item.classList.add('selected');
+          selectedMode = item.getAttribute('data-mode');
+        });
+      });
+
+      document.getElementById('btn-start-game').addEventListener('click', () => {
+        this.startNewGame(selectedMode);
+      });
+
+      // Pause Modal Buttons
+      document.getElementById('btn-resume-game').addEventListener('click', () => this.resumeGame());
+      document.getElementById('btn-restart-game').addEventListener('click', () => this.startNewGame(this.mode));
+      document.getElementById('btn-quit-game').addEventListener('click', () => {
+        this.isRunning = false;
+        this.sound.stopMusic();
+        this.modalPause.classList.remove('active');
+        this.modalMenu.classList.add('active');
+      });
+
+      // Game Over Buttons
+      document.getElementById('btn-play-again').addEventListener('click', () => this.startNewGame(this.mode));
+      document.getElementById('btn-gov-menu').addEventListener('click', () => {
+        this.modalGameOver.classList.remove('active');
+        this.modalMenu.classList.add('active');
+      });
+
+      // --- D-PAD & A/B TOUCH HANDLING (WITH DAS / ARR) ---
+      const bindRepeat = (id, onInitial, onRepeat, das = 140, arr = 40) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        let dasTimer = null, arrInterval = null;
+
+        const start = (e) => {
+          if (e.cancelable) e.preventDefault();
+          el.classList.add('pressed');
+          onInitial();
+          dasTimer = setTimeout(() => {
+            arrInterval = setInterval(onRepeat, arr);
+          }, das);
+        };
+
+        const stop = (e) => {
+          if (e && e.cancelable) e.preventDefault();
+          el.classList.remove('pressed');
+          if (dasTimer) { clearTimeout(dasTimer); dasTimer = null; }
+          if (arrInterval) { clearInterval(arrInterval); arrInterval = null; }
+        };
+
+        el.addEventListener('touchstart', start, { passive: false });
+        el.addEventListener('touchend', stop, { passive: false });
+        el.addEventListener('touchcancel', stop, { passive: false });
+        el.addEventListener('mousedown', start);
+        el.addEventListener('mouseup', stop);
+        el.addEventListener('mouseleave', stop);
+      };
+
+      bindRepeat('btn-move-left', () => this.moveHorizontal(-1), () => this.moveHorizontal(-1));
+      bindRepeat('btn-move-right', () => this.moveHorizontal(1), () => this.moveHorizontal(1));
+      bindRepeat('btn-soft-drop', () => this.softDrop(), () => this.softDrop(), 100, 35);
+
+      const bindSingle = (id, action) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const trigger = (e) => {
+          if (e.cancelable) e.preventDefault();
+          el.classList.add('pressed');
+          action();
+          setTimeout(() => el.classList.remove('pressed'), 80);
+        };
+        el.addEventListener('touchstart', trigger, { passive: false });
+        el.addEventListener('mousedown', trigger);
+      };
+
+      bindSingle('btn-hard-drop', () => this.hardDrop());
+      bindSingle('btn-rotate-cw', () => this.rotatePiece(1)); // Button A
+      bindSingle('btn-rotate-ccw', () => this.rotatePiece(-1)); // Button B
+
+      // Desktop Keyboard
+      window.addEventListener('keydown', (e) => {
+        if (!this.isRunning) return;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') this.moveHorizontal(-1);
+        else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') this.moveHorizontal(1);
+        else if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.softDrop();
+        else if (e.key === ' ' || e.code === 'Space') { e.preventDefault(); this.hardDrop(); }
+        else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === 'x' || e.key === 'X') this.rotatePiece(1);
+        else if (e.key === 'z' || e.key === 'Z') this.rotatePiece(-1);
+        else if (e.key === 'c' || e.key === 'C' || e.key === 'Shift') this.hold();
+        else if (e.key === 'p' || e.key === 'P' || e.key === 'Escape' || e.key === 'Enter') {
+          if (this.isPaused) this.resumeGame();
+          else this.pauseGame();
+        }
+      });
+    }
+  }
+
+  // Bootstrap
+  let game = null;
+  window.addEventListener('DOMContentLoaded', () => {
+    game = new TetrixRetro();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "appId": "com.reima.tetrixmobile",
+  "appName": "Tetrix Mobile",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  }
+}

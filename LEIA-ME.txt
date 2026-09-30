@@ -1,0 +1,85 @@
+TETRIX MOBILE - JOGO CLÁSSICO DE BLOCOS PARA CELULAR (PORTRAIT / VERTICAL)
+=============================================================================
+
+1) COMO JOGAR IMEDIATAMENTE NO CELULAR OU COMPUTADOR:
+------------------------------------------------------
+- Opção A (No Computador):
+  Basta dar 2 cliques no arquivo "www/index.html" para abrir direto em qualquer navegador (Chrome, Edge, Firefox, Safari).
+
+- Opção B (No Celular via Wi-Fi):
+  1. No terminal do computador, rode:
+     python -m http.server 8080 --directory www
+     (ou: npx serve www)
+  2. Descubra o IP do seu computador na rede local (ex: 192.168.1.50).
+  3. No navegador do seu celular (Chrome ou Safari), acerte:
+     http://192.168.1.50:8080
+  4. Pronto! O jogo carrega instantaneamente em tela cheia com alta taxa de quadros (60 FPS).
+
+- Opção C (Instalar como App PWA no Celular sem compilar nada):
+  1. Ao abrir o jogo no Chrome do celular, toque nos 3 pontinhos do navegador e escolha:
+     "Adicionar à tela inicial" ou "Instalar aplicativo".
+  2. Um ícone do TETRIX será criado na gaveta de aplicativos do seu celular.
+  3. O jogo funciona 100% offline, em tela cheia e sem barras de navegação!
+
+
+2) MODOS DE CONTROLE PARA CELULAR:
+----------------------------------
+O jogo inclui 2 estilos de controle pensados para telas touch, alternáveis a qualquer momento:
+
+A) MODO BOTÕES VIRTUAIS (PADRÃO - ARCADE D-PAD):
+   - Mão Esquerda (Polegar Esquerdo):
+     * [ESQ ◀] / [DIR ▶]: Move a peça (toque rápido para 1 coluna ou segure para deslizamento rápido contínuo DAS/ARR).
+     * [DESCER ▼]: Queda suave (Soft drop - pontua +1 por linha).
+     * [DROP ⚡]: Queda instantânea (Hard drop - pontua +2 por linha, efeito sonoro e vibração tátil).
+   - Mão Direita (Polegar Direito):
+     * [GIRAR ↻]: Rotação horária (botão principal amplo).
+     * [↺ ESQ]: Rotação anti-horária.
+     * [HOLD 📥]: Guarda a peça atual na Reserva (permite 1 troca por bloco).
+
+B) MODO GESTOS TOUCH (SWIPE):
+   - Arraste o dedo para a esquerda/direita no tabuleiro para mover a peça.
+   - Toque no tabuleiro para girar.
+   - Deslize para baixo para queda rápida.
+   - Puxe rápido para baixo (flick) para Hard Drop!
+   - Deslize para cima ou use o botão flutuante para Hold (guardar).
+
+C) NO COMPUTADOR (TECLADO):
+   - Setas Esquerda / Direita ou A / D: Movimentação lateral.
+   - Seta para Cima ou X / W: Girar no sentido horário.
+   - Tecla Z: Girar no sentido anti-horário.
+   - Seta para Baixo ou S: Queda suave (Soft Drop).
+   - Barra de Espaço: Queda instantânea (Hard Drop).
+   - Tecla C ou Shift: Guardar peça (Hold).
+   - Tecla P ou Esc: Pausar o jogo.
+
+
+3) RECURSOS E MECÂNICAS INCLUÍDAS:
+----------------------------------
+- Matriz 10x20 padrão oficial Tetris com sistema SRS (Super Rotation System - wall kicks e floor kicks).
+- Gerador 7-Bag Randomizer (distribuição equilibrada sem repetições injustas).
+- Lock Delay (permite deslizar e girar o bloco no chão antes de fixar).
+- Peça Fantasma (Ghost Piece translúcida mostrando exatamente onde o bloco vai cair).
+- Trilha Sonora Chiptune sintetizada 100% via Web Audio API (tema clássico Korobeiniki).
+- Efeitos sonoros procedurais e vibração tátil (Haptics) para celulares compatíveis.
+- 4 Temas visuais: Neon Cyber, Game Boy Retro, Dark AMOLED e Pastel Soft.
+- 3 Modos de jogo:
+  * Maratona Clássica (níveis progressivos e velocidade crescente).
+  * Sprint 40 Linhas (speedrun cronometrado).
+  * Ultra 2 Minutos (score attack em 120 segundos).
+- Recordes salvos automaticamente na memória do aparelho (localStorage).
+
+
+4) COMO GERAR O APK ANDROID COM O CAPACITOR:
+---------------------------------------------
+Caso deseje gerar um arquivo `.apk` instalável para Android:
+1. Certifique-se de ter o Node.js e o Android Studio instalados no PC.
+2. Abra o terminal nesta pasta e execute:
+     npm install
+     npx cap add android
+     npx cap sync
+     npx cap open android
+3. O Android Studio abrirá o projeto.
+4. No menu superior do Android Studio:
+     Build > Build Bundle(s) / APK(s) > Build APK(s)
+5. O APK estará disponível em:
+     android/app/build/outputs/apk/debug/app-debug.apk
